@@ -1,4 +1,4 @@
-const apikey = "eed97c46c60abc1a6fe08d846aeae17c";
+const apikey = "94b6b2c0c27f3fb9e41c0ef98bb5dd43";
 const weatherDataEl = document.getElementById("weather-data");
 const cityInputEl = document.getElementById("city-input");
 const formEl = document.querySelector("form");
@@ -12,13 +12,34 @@ formEl.addEventListener("submit", (event) => {
 async function getWeatherData(cityValue) {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${cityValue}&appid= ${apikey}&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=${cityValue}&appid=${apikey}&units=metric`
     );
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-
     const data = await response.json();
-    console.log(data);
-  } catch (error) {}
+    const temperature = Math.round(data.main.temp);
+    const description = data.weather[0].description;
+    const icon = data.weather[0].icon;
+    const details = [
+      `Feels like: ${Math.round(data.main.feels_like)}°C`,
+      `Humidity : ${data.main.humidity}%`,
+      `Wind speed : ${data.wind.speed}m/s`,
+    ];
+
+    weatherDataEl.querySelector(".icon").innerHTML = `<img
+      src="http://openweathermap.org/img/wn/${icon}.png"
+      alt="Weather Icon"
+    /> `;
+    weatherDataEl.querySelector(
+      ".temperature"
+    ).textContent = `${temperature}°C`;
+    weatherDataEl.querySelector(".description").textContent = description;
+    weatherDataEl.querySelector(".details").innerHTML = details
+      .map((detail) => `<div>${detail}</div>`)
+      .join("");
+  } catch (error) {
+    weatherDataEl.querySelector(".icon").innerHTML = "";
+    weatherDataEl.querySelector(".temperature").textContent = "";
+    weatherDataEl.querySelector(".description").textContent =
+      "An Error happened, please check the input typed";
+    weatherDataEl.querySelector(".details").innerHTML = "";
+  }
 }
